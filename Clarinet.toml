@@ -4,6 +4,10 @@ authors = []
 description = ""
 telemetry = false
 requirements = []
+[contracts.booking-system]
+path = "contracts/booking-system.clar"
+depends_on = []
+
 [contracts.property-registry]
 path = "contracts/property-registry.clar"
 depends_on = []
