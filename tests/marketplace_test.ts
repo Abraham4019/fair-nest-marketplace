@@ -26,3 +26,28 @@ Clarinet.test({
     assertEquals(block.receipts[0].result.expectOk(), true);
   },
 });
+
+Clarinet.test({
+  name: "Ensure can create booking",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const wallet_1 = accounts.get("wallet_1")!;
+    const wallet_2 = accounts.get("wallet_2")!;
+    
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        "booking-system",
+        "create-booking",
+        [
+          types.uint(1),
+          types.uint(1),
+          types.uint(1000),
+          types.uint(1002)
+        ],
+        wallet_2.address
+      )
+    ]);
+    
+    assertEquals(block.receipts.length, 1);
+    assertEquals(block.receipts[0].result.expectOk(), true);
+  },
+});
