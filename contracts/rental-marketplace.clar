@@ -32,3 +32,17 @@
     ))
   )
 )
+
+(define-public (get-property (property-id uint))
+  (ok (map-get? properties { property-id: property-id }))
+)
+
+(define-public (update-availability (property-id uint) (available bool))
+  (let ((property (unwrap! (map-get? properties { property-id: property-id }) err-not-found)))
+    (asserts! (is-eq tx-sender (get owner property)) err-not-authorized)
+    (ok (map-set properties
+      { property-id: property-id }
+      (merge property { available: available })
+    ))
+  )
+)
