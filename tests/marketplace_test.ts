@@ -28,26 +28,32 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure can create booking",
+  name: "Ensure cannot create overlapping bookings",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const wallet_1 = accounts.get("wallet_1")!;
     const wallet_2 = accounts.get("wallet_2")!;
     
-    let block = chain.mineBlock([
+    // First booking
+    let block1 = chain.mineBlock([
       Tx.contractCall(
         "booking-system",
         "create-booking",
-        [
-          types.uint(1),
-          types.uint(1),
-          types.uint(1000),
-          types.uint(1002)
-        ],
+        [types.uint(1), types.uint(1), types.uint(1000), types.uint(1002)],
         wallet_2.address
       )
     ]);
     
-    assertEquals(block.receipts.length, 1);
-    assertEquals(block.receipts[0].result.expectOk(), true);
+    // Overlapping booking attempt
+    let block2 = chain.mineBlock([
+      Tx.contractCall(
+        "booking-system",
+        "create-booking",
+        [types.uint(2), types.uint(1), types.uint(1001), types.uint(1003)],
+        wallet_2.address
+      )
+    ]);
+    
+    assertEquals(block1.receipts[0].result.expectOk(), true);
+    assertEquals(block2.receipts[0].result.expectErr(), "u100"); // err-unavailable
   },
 });
